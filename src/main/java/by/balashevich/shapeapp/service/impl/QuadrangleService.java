@@ -4,27 +4,36 @@ import by.balashevich.shapeapp.entity.Point;
 import by.balashevich.shapeapp.entity.Quadrangle;
 import by.balashevich.shapeapp.entity.QuadrangleType;
 import by.balashevich.shapeapp.service.ShapeService;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class QuadrangleService implements ShapeService<Quadrangle> {
+    private static Logger logger = LogManager.getLogger();
 
     @Override
-    public double calculateArea(Quadrangle quadrangle) {  // TODO: 11.08.2020 is need to check is it convex?
+    public double calculateArea(Quadrangle quadrangle) {
         double area = 0;
 
-        double abSide = calculateSegment(quadrangle.getPointA(), quadrangle.getPointB());
-        double bcSide = calculateSegment(quadrangle.getPointB(), quadrangle.getPointC());
-        double cdSide = calculateSegment(quadrangle.getPointC(), quadrangle.getPointD());
-        double daSide = calculateSegment(quadrangle.getPointD(), quadrangle.getPointA());
-        double acDiagonal = calculateSegment(quadrangle.getPointA(), quadrangle.getPointC());
+        if (isQuadrangleConvex(quadrangle)) {
+            double abSide = calculateSegment(quadrangle.getPointA(), quadrangle.getPointB());
+            double bcSide = calculateSegment(quadrangle.getPointB(), quadrangle.getPointC());
+            double cdSide = calculateSegment(quadrangle.getPointC(), quadrangle.getPointD());
+            double daSide = calculateSegment(quadrangle.getPointD(), quadrangle.getPointA());
+            double acDiagonal = calculateSegment(quadrangle.getPointA(), quadrangle.getPointC());
 
-        double abcHalfPerimeter = (abSide + bcSide + acDiagonal) / 2;
-        double abcTriangleArea = Math.sqrt(abcHalfPerimeter
-                * (abcHalfPerimeter - abSide) * (abcHalfPerimeter - bcSide) * (abcHalfPerimeter - acDiagonal));
-        double acdHalfPerimeter = (acDiagonal + cdSide + daSide) / 2;
-        double acdTriangleArea = Math.sqrt(acdHalfPerimeter
-                * (acdHalfPerimeter - acDiagonal) * (acdHalfPerimeter - cdSide) * (acdHalfPerimeter - daSide));
+            double abcHalfPerimeter = (abSide + bcSide + acDiagonal) / 2;
+            double abcTriangleArea = Math.sqrt(abcHalfPerimeter
+                    * (abcHalfPerimeter - abSide) * (abcHalfPerimeter - bcSide) * (abcHalfPerimeter - acDiagonal));
+            double acdHalfPerimeter = (acDiagonal + cdSide + daSide) / 2;
+            double acdTriangleArea = Math.sqrt(acdHalfPerimeter
+                    * (acdHalfPerimeter - acDiagonal) * (acdHalfPerimeter - cdSide) * (acdHalfPerimeter - daSide));
 
-        area = abcTriangleArea + acdTriangleArea;
+            area = abcTriangleArea + acdTriangleArea;
+            logger.log(Level.INFO, "quadrangle {} area is {}", quadrangle.getId(), area);
+        } else{
+            logger.log(Level.INFO, "quadrangle {} area can t be counted", quadrangle.getId());
+        }
 
         return area;
     }
@@ -37,6 +46,7 @@ public class QuadrangleService implements ShapeService<Quadrangle> {
         perimeter += calculateSegment(quadrangle.getPointB(), quadrangle.getPointC());
         perimeter += calculateSegment(quadrangle.getPointC(), quadrangle.getPointD());
         perimeter += calculateSegment(quadrangle.getPointD(), quadrangle.getPointA());
+        logger.log(Level.INFO, "quadrangle {} perimeter is {}", quadrangle.getId(), perimeter);
 
         return perimeter;
     }
@@ -61,12 +71,13 @@ public class QuadrangleService implements ShapeService<Quadrangle> {
                 isConvex = true;
             }
         }
+        logger.log(Level.INFO, "quadrangle {} is convex: {}", quadrangle.getId(), isConvex);
 
         return isConvex;
     }
 
     public QuadrangleType determineQuadrangleType(Quadrangle quadrangle) {
-        QuadrangleType type = QuadrangleType.UNKNOWN; // TODO: 17.08.2020 May be put type in Quadrangle class like Field
+        QuadrangleType type = QuadrangleType.UNKNOWN;
 
         double abSide = calculateSegment(quadrangle.getPointA(), quadrangle.getPointB());
         double bcSide = calculateSegment(quadrangle.getPointB(), quadrangle.getPointC());
@@ -97,6 +108,7 @@ public class QuadrangleService implements ShapeService<Quadrangle> {
                 type = QuadrangleType.TRAPEZE;
             }
         }
+        logger.log(Level.INFO, "quadrangle {} type is: {}", quadrangle.getId(), type);
 
         return type;
     }

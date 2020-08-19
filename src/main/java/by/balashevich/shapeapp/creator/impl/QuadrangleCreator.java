@@ -6,6 +6,9 @@ import by.balashevich.shapeapp.entity.Point;
 import by.balashevich.shapeapp.entity.Quadrangle;
 import by.balashevich.shapeapp.exception.ShapeProjectException;
 import by.balashevich.shapeapp.validator.QuadrangleValidator;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +16,7 @@ import java.util.Optional;
 
 public class QuadrangleCreator implements ShapeCreator<Quadrangle> {
     private static final int NUMBER_POINTS = 4;
+    private static Logger logger = LogManager.getLogger();
 
     @Override
     public List<Quadrangle> createShapes(List<List<Double>> shapesData) throws ShapeProjectException {
@@ -25,7 +29,6 @@ public class QuadrangleCreator implements ShapeCreator<Quadrangle> {
             }
         } else{
             throw new ShapeProjectException();
-            // TODO: 18.08.2020 add logger
         }
 
         return quadrangleList;
@@ -50,7 +53,7 @@ public class QuadrangleCreator implements ShapeCreator<Quadrangle> {
                 }
             }
         } catch(ShapeProjectException e){
-            // TODO: 19.08.2020 add logger
+            logger.log(Level.ERROR, "error while creating quadrangle", e);
         }
 
         return quadrangle;

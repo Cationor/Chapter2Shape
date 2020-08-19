@@ -1,13 +1,17 @@
 package by.balashevich.shapeapp.warehouse;
 
 import by.balashevich.shapeapp.exception.ShapeProjectException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class QuadrangleWarehouse {
-    private Map<Long, QuadrangleCharacteristic> characteristicList;
+    private static Logger logger = LogManager.getLogger();
     private static QuadrangleWarehouse instance;
+    private Map<Long, QuadrangleCharacteristic> characteristicList;
 
     private QuadrangleWarehouse (){
         characteristicList = new HashMap<>();
@@ -21,22 +25,26 @@ public class QuadrangleWarehouse {
         return instance;
     }
 
-    public QuadrangleCharacteristic addCharacteristic(long id, QuadrangleCharacteristic parameters) throws ShapeProjectException {
-        QuadrangleCharacteristic addedCharacteristic = characteristicList.put(id, parameters);
+    public QuadrangleCharacteristic putCharacteristic(long id, QuadrangleCharacteristic parameters) throws ShapeProjectException {
+        QuadrangleCharacteristic placedCharacteristic = characteristicList.put(id, parameters);
 
-        if (addedCharacteristic == null){
-            throw new ShapeProjectException(); // TODO: 17.08.2020  add log
+        if (placedCharacteristic == null){
+            throw new ShapeProjectException();
         }
+        logger.log(Level.INFO, "Quadrangle id {}, {} placed into warehouse", id, placedCharacteristic);
+
         return characteristicList.put(id, parameters);
     }
 
     public QuadrangleCharacteristic getCharacteristic(long id) throws ShapeProjectException {
         QuadrangleCharacteristic quadrangleCharacteristic;
+
         if (characteristicList.containsKey(id)){
             quadrangleCharacteristic = characteristicList.get(id);
         } else{
-            throw new ShapeProjectException(); // TODO: 17.08.2020  add log
+            throw new ShapeProjectException();
         }
+        logger.log(Level.INFO, "Quadrangle id {}, {} selected into warehouse", id, quadrangleCharacteristic);
 
         return quadrangleCharacteristic;
     }
@@ -45,8 +53,10 @@ public class QuadrangleWarehouse {
         QuadrangleCharacteristic removedCharacteristic = characteristicList.remove(id);
 
         if (removedCharacteristic == null){
-            throw new ShapeProjectException(); // TODO: 17.08.2020  add log
+            throw new ShapeProjectException();
         }
+        logger.log(Level.INFO, "Quadrangle id {}, {} removed from warehouse", id, removedCharacteristic);
+
         return removedCharacteristic;
     }
 }

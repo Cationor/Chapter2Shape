@@ -8,8 +8,12 @@ import by.balashevich.shapeapp.observer.QuadrangleEvent;
 import by.balashevich.shapeapp.service.impl.QuadrangleService;
 import by.balashevich.shapeapp.warehouse.QuadrangleCharacteristic;
 import by.balashevich.shapeapp.warehouse.QuadrangleWarehouse;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class QuadrangleObserver implements Observer<QuadrangleEvent> {
+    private static Logger logger = LogManager.getLogger();
 
     @Override
     public void actionPerformed(QuadrangleEvent eventObject) {
@@ -25,9 +29,9 @@ public class QuadrangleObserver implements Observer<QuadrangleEvent> {
         QuadrangleCharacteristic characteristic = new QuadrangleCharacteristic(area, perimeter, type, isConvex);
 
         try {
-            warehouse.addCharacteristic(eventQuadrangle.getId(), characteristic);
+            warehouse.putCharacteristic(eventQuadrangle.getId(), characteristic);
         } catch (ShapeProjectException e) {
-            // TODO: 17.08.2020 add log 
+            logger.log(Level.ERROR, "error while changing characteristic in warehouse" , e);
         }
     }
 }
