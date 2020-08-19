@@ -1,10 +1,10 @@
 package by.balashevich.shapeapp.creator.impl;
 
+import by.balashevich.shapeapp.creator.PointCreator;
 import by.balashevich.shapeapp.creator.ShapeCreator;
+import by.balashevich.shapeapp.entity.Point;
 import by.balashevich.shapeapp.entity.Quadrangle;
-import by.balashevich.shapeapp.entity.Shape;
-import by.balashevich.shapeapp.factory.ShapeFactory;
-import by.balashevich.shapeapp.repository.QuadrangleRepository;
+import by.balashevich.shapeapp.exception.ShapeProjectException;
 import by.balashevich.shapeapp.validator.QuadrangleValidator;
 
 import java.util.ArrayList;
@@ -12,26 +12,47 @@ import java.util.List;
 import java.util.Optional;
 
 public class QuadrangleCreator implements ShapeCreator<Quadrangle> {
+    private static final int NUMBER_POINTS = 4;
 
     @Override
-    public List<Quadrangle> createShapes(List<String> shapeData) {
-        QuadrangleValidator validator = new QuadrangleValidator();
+    public List<Quadrangle> createShapes(List<List<Double>> shapesData) throws ShapeProjectException {
         List<Quadrangle> quadrangleList = new ArrayList<>();
-        QuadrangleRepository repository = QuadrangleRepository.getInstance();
 
-        for(String shapeDataElement : shapeData){
-            if (validator.isQuadrangleDataCorrect(shapeDataElement)){
-                Optional<Shape> optionalShape = ShapeFactory.QUADRANGLE.createShape(shapeDataElement);
-                if (optionalShape.isPresent()){
-                    Quadrangle quadrangle = (Quadrangle) optionalShape.get();
-                    quadrangle.notifyObserver();
-                    repository.add(quadrangle);
-                } else{
-                    // TODO: 17.08.2020 add log
-                }
+        if (shapesData != null && !shapesData.isEmpty()) {
+            for (List<Double> shapeDataElement : shapesData) {
+                Optional<Quadrangle> quadrangle = createShape(shapeDataElement);
+                quadrangle.ifPresent(quadrangleList::add);
             }
+        } else{
+            throw new ShapeProjectException();
+            // TODO: 18.08.2020 add logger
         }
 
         return quadrangleList;
+    }
+
+    @Override
+    public Optional<Quadrangle> createShape(List<Double> shapeData) {
+        QuadrangleValidator validator = new QuadrangleValidator();
+        PointCreator creator = new PointCreator();
+        Optional<Quadrangle> quadrangle = Optional.empty();
+
+        try {
+            List<Point> pointList = creator.createPoints(shapeData);
+            if (pointList != null && !pointList.isEmpty() && pointList.size() == NUMBER_POINTS) {
+                Point pointA = pointList.get(0);
+                Point pointB = pointList.get(1);
+                Point pointC = pointList.get(2);
+                Point pointD = pointList.get(3);
+
+                if (validator.isQuadrangleExist(pointA, pointB, pointC, pointD)) {
+                    quadrangle = Optional.of(new Quadrangle(pointA, pointB, pointC, pointD));
+                }
+            }
+        } catch(ShapeProjectException e){
+            // TODO: 19.08.2020 add logger
+        }
+
+        return quadrangle;
     }
 }

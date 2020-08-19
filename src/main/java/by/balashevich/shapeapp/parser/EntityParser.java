@@ -1,27 +1,61 @@
 package by.balashevich.shapeapp.parser;
 
-import by.balashevich.shapeapp.entity.Point;
-import by.balashevich.shapeapp.entity.Quadrangle;
+import by.balashevich.shapeapp.exception.ShapeProjectException;
+import by.balashevich.shapeapp.validator.PointValidator;
+import by.balashevich.shapeapp.validator.QuadrangleValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntityParser {
     private static final String POINTS_DELIMITER = ";";
     private static final String COORDINATES_DELIMITER = "\\s";
 
-    public Quadrangle parseQuadrangle(String quadrangleData) {     // TODO: 12.08.2020 may be need there validate string or make it on method what call that method
-        String[] pointsData = quadrangleData.split(POINTS_DELIMITER);
-        Point pointA = parsePoint(pointsData[0]);
-        Point pointB = parsePoint(pointsData[1]);
-        Point pointC = parsePoint(pointsData[2]);
-        Point pointD = parsePoint(pointsData[3]);
+    public List<List<Double>> parseQuadrangles(List<String> quadranglesData) {
+        List<List<Double>> quadranglesCoordinatesList = new ArrayList<>();
 
-        return new Quadrangle(pointA, pointB, pointC, pointD);
+        for (String quadrangleDataElement : quadranglesData) {
+            try {
+                quadranglesCoordinatesList.add(parseQuadrangle(quadrangleDataElement));
+            } catch (ShapeProjectException e){
+                // TODO: 18.08.2020 add logger
+            }
+
+        }
+
+        return quadranglesCoordinatesList;
     }
 
-    public Point parsePoint(String pointData) {
-        String[] coordinatesData = pointData.trim().split(COORDINATES_DELIMITER);
-        double coordinateX = Double.parseDouble(coordinatesData[0].trim());
-        double coordinateY = Double.parseDouble(coordinatesData[1].trim());
+    public List<Double> parseQuadrangle(String quadrangleData) throws ShapeProjectException {
+        QuadrangleValidator validator = new QuadrangleValidator();
+        List<Double> quadrangleCoordinates = new ArrayList<>();
 
-        return new Point(coordinateX, coordinateY);
+        if (validator.isQuadrangleDataCorrect(quadrangleData)) {
+            String[] pointsData = quadrangleData.split(POINTS_DELIMITER);
+            for(String pointDataElement : pointsData){
+                quadrangleCoordinates.addAll(parsePoint(pointDataElement));
+            }
+        } else{
+            throw new ShapeProjectException();
+            // TODO: 18.08.2020 add logger
+        }
+
+        return quadrangleCoordinates;
+    }
+
+    public List<Double> parsePoint(String pointData) throws ShapeProjectException {
+        PointValidator validator = new PointValidator();
+        List<Double> pointCoordinates = new ArrayList<>();
+
+        if (validator.isPointDataCorrect(pointData)) {
+            String[] coordinatesData = pointData.trim().split(COORDINATES_DELIMITER);
+            pointCoordinates.add(Double.parseDouble(coordinatesData[0].trim()));
+            pointCoordinates.add(Double.parseDouble(coordinatesData[1].trim()));
+        } else{
+            throw new ShapeProjectException();
+            // TODO: 18.08.2020 add logger
+        }
+
+        return pointCoordinates;
     }
 }
