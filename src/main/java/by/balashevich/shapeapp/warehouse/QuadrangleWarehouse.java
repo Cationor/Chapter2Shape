@@ -29,7 +29,7 @@ public class QuadrangleWarehouse {
         QuadrangleCharacteristic placedCharacteristic = characteristicList.put(id, parameters);
 
         if (placedCharacteristic == null){
-            throw new ShapeProjectException();
+            throw new ShapeProjectException("Error while placing characteristic into warehouse");
         }
         logger.log(Level.INFO, "Quadrangle id {}, {} placed into warehouse", id, placedCharacteristic);
 
@@ -42,7 +42,7 @@ public class QuadrangleWarehouse {
         if (characteristicList.containsKey(id)){
             quadrangleCharacteristic = characteristicList.get(id);
         } else{
-            throw new ShapeProjectException();
+            throw new ShapeProjectException("Error while selecting characteristic from warehouse"); // TODO: 19.08.2020 is it good to have exception there, not very usable
         }
         logger.log(Level.INFO, "Quadrangle id {}, {} selected into warehouse", id, quadrangleCharacteristic);
 
@@ -53,7 +53,7 @@ public class QuadrangleWarehouse {
         QuadrangleCharacteristic removedCharacteristic = characteristicList.remove(id);
 
         if (removedCharacteristic == null){
-            throw new ShapeProjectException();
+            throw new ShapeProjectException("Error while removing characteristic from warehouse");
         }
         logger.log(Level.INFO, "Quadrangle id {}, {} removed from warehouse", id, removedCharacteristic);
 

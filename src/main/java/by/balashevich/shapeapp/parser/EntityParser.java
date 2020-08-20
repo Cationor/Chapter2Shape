@@ -3,6 +3,9 @@ package by.balashevich.shapeapp.parser;
 import by.balashevich.shapeapp.exception.ShapeProjectException;
 import by.balashevich.shapeapp.validator.PointValidator;
 import by.balashevich.shapeapp.validator.QuadrangleValidator;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +13,7 @@ import java.util.List;
 public class EntityParser {
     private static final String POINTS_DELIMITER = ";";
     private static final String COORDINATES_DELIMITER = "\\s";
+    private static Logger logger = LogManager.getLogger();
 
     public List<List<Double>> parseQuadrangles(List<String> quadranglesData) {
         List<List<Double>> quadranglesCoordinatesList = new ArrayList<>();
@@ -17,8 +21,8 @@ public class EntityParser {
         for (String quadrangleDataElement : quadranglesData) {
             try {
                 quadranglesCoordinatesList.add(parseQuadrangle(quadrangleDataElement));
-            } catch (ShapeProjectException e){
-                // TODO: 18.08.2020 add logger
+            } catch (ShapeProjectException e) {
+                logger.log(Level.ERROR, "Error while parsing quadrangles data", e);
             }
 
         }
@@ -32,12 +36,11 @@ public class EntityParser {
 
         if (validator.isQuadrangleDataCorrect(quadrangleData)) {
             String[] pointsData = quadrangleData.split(POINTS_DELIMITER);
-            for(String pointDataElement : pointsData){
+            for (String pointDataElement : pointsData) {
                 quadrangleCoordinates.addAll(parsePoint(pointDataElement));
             }
-        } else{
-            throw new ShapeProjectException();
-            // TODO: 18.08.2020 add logger
+        } else {
+            throw new ShapeProjectException("Error while parsing quadrangle data");
         }
 
         return quadrangleCoordinates;
@@ -51,9 +54,8 @@ public class EntityParser {
             String[] coordinatesData = pointData.trim().split(COORDINATES_DELIMITER);
             pointCoordinates.add(Double.parseDouble(coordinatesData[0].trim()));
             pointCoordinates.add(Double.parseDouble(coordinatesData[1].trim()));
-        } else{
-            throw new ShapeProjectException();
-            // TODO: 18.08.2020 add logger
+        } else {
+            throw new ShapeProjectException("Error while parsing point data");
         }
 
         return pointCoordinates;

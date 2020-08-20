@@ -70,8 +70,8 @@ public class QuadrangleCharacteristic {
     @Override
     public int hashCode() {
         int result = 1;
-        result += 37 * result + (int) area;
-        result += 37 * result + (int) perimeter;
+        result += 37 * result + Double.valueOf(area).hashCode();
+        result += 37 * result + Double.valueOf(perimeter).hashCode();
         result += type.hashCode();
         result += 37 * result + (isConvex ? 1 : 0);
 

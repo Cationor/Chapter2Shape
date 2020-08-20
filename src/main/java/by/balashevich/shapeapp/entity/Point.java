@@ -43,8 +43,8 @@ public class Point {
     @Override
     public int hashCode() {
         int result = 1;
-        result += 37 * result + (int) coordinateX;
-        result += 37 * result + (int) coordinateY;
+        result += 37 * result + Double.valueOf(coordinateX).hashCode();
+        result += 37 * result + Double.valueOf(coordinateY).hashCode();
 
         return result;
     }

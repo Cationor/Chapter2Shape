@@ -29,7 +29,7 @@ public abstract class Shape {
     @Override
     public int hashCode() {
         int result = 1;
-        result += 37 * result + (int) id;
+        result += 37 * result + Long.valueOf(id).hashCode();
 
         return result;
     }
